@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log Reader</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="toolbar card">
+        <button id="chooseFileBtn" class="btn primary">选择日志文件</button>
+        <span id="fileName" class="file-name">未选择文件</span>
+
+        <div class="spacer"></div>
+
+        <div id="viewSwitch" class="row view-switch" role="tablist" aria-label="阅读模式">
+          <button id="showPageViewBtn" class="btn active" type="button">分页阅读</button>
+          <button id="showTailViewBtn" class="btn" type="button">实时阅读</button>
+        </div>
+
+        <label class="inline-label" for="fontSizeInput">字体大小</label>
+        <input id="fontSizeInput" class="input" type="number" min="11" max="30" value="14" />
+      </header>
+
+      <section class="layout">
+        <article class="panel card">
+          <div id="pageView" class="view-mode">
+            <div class="panel-head">
+              <h2>分页阅读</h2>
+              <div class="row">
+                <button id="prevPageBtn" class="btn" disabled>上一页</button>
+                <span id="pageInfo">第 1 页</span>
+                <button id="nextPageBtn" class="btn" disabled>下一页</button>
+                <button id="refreshPageBtn" class="btn info">刷新最新</button>
+                <label class="inline-label" for="pageSizeInput">每页行数</label>
+                <input id="pageSizeInput" class="input" type="number" min="1" max="5000" value="15" />
+                <label class="inline-label" for="jumpPageInput">跳转</label>
+                <input id="jumpPageInput" class="input" type="number" min="1" value="1" />
+                <button id="jumpPageBtn" class="btn">前往</button>
+                <label class="row checkbox-row" for="pageAutoRefreshToggle">
+                  <input id="pageAutoRefreshToggle" type="checkbox" />
+                  10秒自动刷新
+                </label>
+                <button id="resumeProgressBtn" class="btn info">回到上次进度</button>
+                <button id="saveProgressBtn" class="btn success">保存进度</button>
+              </div>
+            </div>
+
+            <div id="pageList" class="log-list"></div>
+          </div>
+
+          <div id="tailView" class="view-mode hidden">
+            <div class="panel-head">
+              <h2>实时阅读</h2>
+              <div class="row">
+                <button id="startTailBtn" class="btn success">开始实时</button>
+                <button id="stopTailBtn" class="btn danger" disabled>停止实时</button>
+                <label class="row checkbox-row" for="autoScrollToggle">
+                  <input id="autoScrollToggle" type="checkbox" checked />
+                  自动滚动
+                </label>
+              </div>
+            </div>
+
+            <div id="tailList" class="log-list"></div>
+          </div>
+        </article>
+      </section>
+
+      <footer id="statusBar" class="status">准备就绪</footer>
+    </main>
+
+    <div id="errorModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="errorModalTitle">
+      <div class="modal-card card">
+        <h3 id="errorModalTitle">提示</h3>
+        <p id="errorModalMessage"></p>
+        <div class="modal-actions">
+          <button id="errorModalConfirmBtn" class="btn primary" type="button">我知道了</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./renderer.js"></script>
+  </body>
+</html>
