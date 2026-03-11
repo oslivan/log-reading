@@ -98,6 +98,11 @@ jobs:
           allowUpdates: true
           replacesArtifacts: true
           artifactErrorsFailBuild: true
-          artifacts: dist/**
+          artifacts: |
+            dist/**/*.exe
+            dist/**/*.dmg
+            dist/**/*.zip
+            dist/**/*.yml
+            dist/**/*.blockmap
           body: |
             Automated build from commit ${{ github.sha }}.
