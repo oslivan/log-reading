@@ -38,3 +38,26 @@ npm run pack:win
 ## 书签存储
 
 书签会保存在 Electron 的用户数据目录中的 `bookmarks.json`。
+
+## GitHub Actions 构建
+
+已添加工作流：`.github/workflows/build-packages.yml`
+
+构建目标仅包含：
+
+- Windows amd64
+- macOS amd64
+- macOS arm64
+
+触发方式：
+
+- 手动触发：GitHub 仓库页面 `Actions` → `Build Packages` → `Run workflow`
+- Tag 触发：推送 `v*` 标签（例如 `v0.1.0`）
+
+下载产物：
+
+1. 进入对应 workflow run
+2. 在 `Artifacts` 区域下载：
+	- `log-reading-windows-amd64`
+	- `log-reading-macos-amd64`
+	- `log-reading-macos-arm64`
