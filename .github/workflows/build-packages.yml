@@ -1,11 +1,9 @@
 name: Build Packages
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - master
     tags:
+      - 'build-*'
       - 'v*'
 
 permissions:
@@ -79,13 +77,12 @@ jobs:
       - name: Resolve release metadata
         id: release_meta
         run: |
-          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          if [[ "${GITHUB_REF_NAME}" == v* ]]; then
             echo "name=Release ${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=auto-build" >> "$GITHUB_OUTPUT"
-            echo "name=Auto Build (master)" >> "$GITHUB_OUTPUT"
+            echo "name=Auto Build ${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -96,6 +93,7 @@ jobs:
           name: ${{ steps.release_meta.outputs.name }}
           prerelease: ${{ steps.release_meta.outputs.prerelease }}
           allowUpdates: true
+          removeArtifacts: true
           replacesArtifacts: true
           artifactErrorsFailBuild: true
           artifacts: |

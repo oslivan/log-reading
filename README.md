@@ -30,34 +30,42 @@ npm run pack:win
 ## 使用说明
 
 1. 点击“选择日志文件”
-2. 设置“每页行数”，用“上一页/下一页”分页查看
-3. 点击“开始实时”进入追加读取模式
-4. 点击“标记当前位置”保存当前页/实时偏移
-5. 点击“读取书签”恢复之前的位置
+2. 在“分页阅读”中设置“每页行数”，用“上一页/下一页/跳转”查看
+3. 可点击“刷新最新”跳到最后一页，或开启“10秒自动刷新”同步当前页与总页数
+4. 点击“保存进度”记录当前分页位置
+5. 点击“回到上次进度”恢复最近保存的阅读位置
+6. 切换到“实时阅读”后点击“开始实时”，初始仅加载最近 5 条，随后持续追加新日志
 
-## 书签存储
+## 进度存储
 
-书签会保存在 Electron 的用户数据目录中的 `bookmarks.json`。
+阅读进度会保存在 Electron 的用户数据目录中的 `bookmarks.json`。
 
-## GitHub Actions 构建
+## GitHub Actions 构建与发布
 
-已添加工作流：`.github/workflows/build-packages.yml`
+已配置两段式工作流：
 
-构建目标仅包含：
+- `.github/workflows/auto-tag.yml`
+	- 触发：push 到 `master/main`
+	- 动作：自动创建唯一 `build-*` 标签并推送
+- `.github/workflows/build-packages.yml`
+	- 触发：push `build-*` 或 `v*` 标签
+	- 动作：构建 + 发布 Release
+
+构建目标：
 
 - Windows amd64
 - macOS amd64
 - macOS arm64
 
-触发方式：
+发布策略：
 
-- 手动触发：GitHub 仓库页面 `Actions` → `Build Packages` → `Run workflow`
-- Tag 触发：推送 `v*` 标签（例如 `v0.1.0`）
+- `build-*`：发布为预发布（Auto Build）
+- `v*`：发布为正式版本（Release）
 
 下载产物：
 
-1. 进入对应 workflow run
-2. 在 `Artifacts` 区域下载：
-	- `log-reading-windows-amd64`
-	- `log-reading-macos-amd64`
-	- `log-reading-macos-arm64`
+1. 进入 GitHub `Releases` 页面或对应 workflow run
+2. 在 Release Assets / Artifacts 中下载：
+	 - `*.exe`（Windows）
+	 - `*.dmg`（macOS）
+	 - `*.zip`（macOS）
