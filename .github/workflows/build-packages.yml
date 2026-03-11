@@ -102,7 +102,5 @@ jobs:
             dist/**/*.exe
             dist/**/*.dmg
             dist/**/*.zip
-            dist/**/*.yml
-            dist/**/*.blockmap
           body: |
             Automated build from commit ${{ github.sha }}.
