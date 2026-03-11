@@ -140,7 +140,7 @@ function syncPageAutoRefreshTimer() {
   }
 
   pageAutoRefreshTimer = setInterval(() => {
-    refreshLatestPage().catch((error) => setStatus(`自动刷新失败：${error.message}`));
+    autoRefreshCurrentPage().catch((error) => setStatus(`自动刷新失败：${error.message}`));
   }, PAGE_AUTO_REFRESH_MS);
 }
 
@@ -250,7 +250,10 @@ async function loadLastPage() {
   updatePageInfo(result.page);
   el.jumpPageInput.value = String(result.page);
 
-  setStatus(`已定位最后一页：第 ${result.page} 页，${result.lines.length} 行`);
+  const lastPageLines = typeof result.lastPageLineCount === 'number'
+    ? result.lastPageLineCount
+    : result.lines.length;
+  setStatus(`已定位最后一页：第 ${result.page} 页，${lastPageLines} 行`);
 }
 
 async function refreshLatestPage() {
@@ -260,6 +263,16 @@ async function refreshLatestPage() {
   }
 
   await loadLastPage();
+}
+
+async function autoRefreshCurrentPage() {
+  if (!state.file) {
+    return;
+  }
+
+  await refreshPageTotals(true);
+  state.page = Math.max(1, Math.min(state.page, state.totalPages));
+  await loadPage();
 }
 
 function getDefaultBookmark() {

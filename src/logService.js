@@ -74,7 +74,7 @@ async function readPage(filePath, page, pageSize) {
 
       lineNo += 1;
 
-      if (lineNo >= endLineExclusive) {
+      if (lineNo > endLineExclusive) {
         hasNextPage = true;
         break;
       }
@@ -129,6 +129,12 @@ async function readLastPage(filePath, pageSize) {
 
   const page = Math.max(1, Math.ceil(totalLines / currentPageSize));
   const totalPages = page;
+  const lastPageLineCount = totalLines === 0
+    ? 0
+    : totalLines - ((totalPages - 1) * currentPageSize);
+  const lastPageLines = lastPageLineCount === 0
+    ? []
+    : lines.slice(-lastPageLineCount);
 
   const stats = await fsp.stat(filePath);
   lineCountCache.set(filePath, {
@@ -142,7 +148,8 @@ async function readLastPage(filePath, pageSize) {
     pageSize: currentPageSize,
     totalLines,
     totalPages,
-    lines,
+    lastPageLineCount,
+    lines: lastPageLines,
     hasPrevPage: page > 1,
     hasNextPage: false
   };
