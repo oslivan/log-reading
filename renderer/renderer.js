@@ -46,10 +46,44 @@ const el = {
 };
 
 const PAGE_AUTO_REFRESH_MS = 10_000;
+const UI_SETTINGS_KEY = 'logReader.uiSettings.v1';
 let pageAutoRefreshTimer = null;
 
 function setStatus(text) {
   el.statusBar.textContent = text;
+}
+
+function loadUiSettings() {
+  try {
+    const raw = window.localStorage.getItem(UI_SETTINGS_KEY);
+    if (!raw) {
+      return;
+    }
+
+    const settings = JSON.parse(raw);
+    if (settings && typeof settings === 'object') {
+      if (typeof settings.logFontSize === 'number') {
+        state.logFontSize = settings.logFontSize;
+      }
+      if (typeof settings.pageSize === 'number') {
+        state.pageSize = settings.pageSize;
+      }
+      if (typeof settings.pageAutoRefresh === 'boolean') {
+        state.pageAutoRefresh = settings.pageAutoRefresh;
+      }
+    }
+  } catch {
+    // ignore invalid local settings
+  }
+}
+
+function persistUiSettings() {
+  const settings = {
+    logFontSize: state.logFontSize,
+    pageSize: state.pageSize,
+    pageAutoRefresh: state.pageAutoRefresh
+  };
+  window.localStorage.setItem(UI_SETTINGS_KEY, JSON.stringify(settings));
 }
 
 function showErrorPopup(message) {
@@ -72,6 +106,14 @@ function applyLogFontSize(size) {
   state.logFontSize = nextSize;
   el.fontSizeInput.value = String(nextSize);
   document.documentElement.style.setProperty('--log-font-size', `${nextSize}px`);
+  persistUiSettings();
+}
+
+function applyPageSize(size) {
+  const nextSize = Math.max(1, Math.min(5000, Number(size) || 15));
+  state.pageSize = nextSize;
+  el.pageSizeInput.value = String(nextSize);
+  persistUiSettings();
 }
 
 function updatePageInfo(page) {
@@ -208,8 +250,7 @@ async function loadPage() {
     return;
   }
 
-  state.pageSize = Math.max(1, Math.min(5000, Number(el.pageSizeInput.value) || 15));
-  el.pageSizeInput.value = String(state.pageSize);
+  applyPageSize(el.pageSizeInput.value);
 
   setStatus(`正在读取第 ${state.page} 页...`);
   const result = await window.logApi.readLogPage({
@@ -232,8 +273,7 @@ async function loadLastPage() {
     return;
   }
 
-  state.pageSize = Math.max(1, Math.min(5000, Number(el.pageSizeInput.value) || 15));
-  el.pageSizeInput.value = String(state.pageSize);
+  applyPageSize(el.pageSizeInput.value);
 
   setStatus('正在读取最后一页...');
   const result = await window.logApi.readLastLogPage({
@@ -476,8 +516,9 @@ el.jumpPageInput.addEventListener('keydown', (event) => {
 });
 
 el.pageSizeInput.addEventListener('change', () => {
+  applyPageSize(el.pageSizeInput.value);
   if (!state.file) {
-    notifyNeedFile();
+    setStatus('已保存每页行数设置');
     return;
   }
   loadLastPage().catch((error) => setStatus(`读取失败：${error.message}`));
@@ -489,6 +530,7 @@ el.refreshPageBtn.addEventListener('click', () => {
 
 el.pageAutoRefreshToggle.addEventListener('change', () => {
   state.pageAutoRefresh = el.pageAutoRefreshToggle.checked;
+  persistUiSettings();
   syncPageAutoRefreshTimer();
   setStatus(state.pageAutoRefresh ? '已开启10秒自动刷新' : '已关闭10秒自动刷新');
 });
@@ -536,6 +578,9 @@ document.addEventListener('keydown', (event) => {
 
 clearList(el.pageList, '请选择日志文件后开始分页阅读');
 clearList(el.tailList, '实时日志会在这里逐行显示');
+loadUiSettings();
+applyPageSize(state.pageSize);
+el.pageAutoRefreshToggle.checked = state.pageAutoRefresh;
 applyViewState();
 updatePageInfo(1);
 applyLogFontSize(state.logFontSize);
