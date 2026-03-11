@@ -189,11 +189,33 @@ body {
   font-size: var(--log-font-size);
   white-space: pre-wrap;
   word-break: break-word;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .log-item .line-no {
   color: #60a5fa;
   margin-right: 8px;
+}
+
+.log-time {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border) 45%);
+  background: color-mix(in srgb, var(--accent) 22%, #0f172a 78%);
+  color: #bfdbfe;
+  font-size: calc(var(--log-font-size) - 1px);
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.log-body {
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-width: 0;
 }
 
 .status {

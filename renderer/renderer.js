@@ -198,6 +198,41 @@ function normalizeLogText(text) {
   return String(text ?? '').replace(/<br\s*\/?>/gi, '\n');
 }
 
+function splitTimestampPrefix(text) {
+  const normalizedText = normalizeLogText(text);
+  const match = normalizedText.match(/^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}(?:[.,]\d{1,3})?)(\s+|$)([\s\S]*)/);
+  if (!match) {
+    return {
+      timestamp: '',
+      message: normalizedText
+    };
+  }
+
+  return {
+    timestamp: match[1],
+    message: match[3] || ''
+  };
+}
+
+function createLogItemContent(container, rawText) {
+  const { timestamp, message } = splitTimestampPrefix(rawText || ' ');
+  if (!timestamp) {
+    container.textContent = message || ' ';
+    return;
+  }
+
+  const timeTag = document.createElement('span');
+  timeTag.className = 'log-time';
+  timeTag.textContent = timestamp;
+
+  const messageNode = document.createElement('span');
+  messageNode.className = 'log-body';
+  messageNode.textContent = message || ' ';
+
+  container.appendChild(timeTag);
+  container.appendChild(messageNode);
+}
+
 function renderPageLines(lines) {
   el.pageList.innerHTML = '';
   if (!lines.length) {
@@ -209,11 +244,7 @@ function renderPageLines(lines) {
   for (const line of lines) {
     const row = document.createElement('div');
     row.className = 'log-item';
-
-    const text = document.createElement('span');
-    text.textContent = normalizeLogText(line.text || ' ');
-
-    row.appendChild(text);
+    createLogItemContent(row, line.text || ' ');
     el.pageList.appendChild(row);
   }
 
@@ -230,7 +261,7 @@ function appendTailLines(lines) {
   for (const textLine of lines) {
     const row = document.createElement('div');
     row.className = 'log-item';
-    row.textContent = normalizeLogText(textLine || ' ');
+    createLogItemContent(row, textLine || ' ');
     fragment.appendChild(row);
   }
 
