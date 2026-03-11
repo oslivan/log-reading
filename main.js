@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, screen, Menu } = require('electron');
 const { readPage, readLastPage, countLines, getFileMeta } = require('./src/logService');
 const { BookmarkStore } = require('./src/bookmarkStore');
 
@@ -53,11 +53,15 @@ async function readLastLines(filePath, limit = TAIL_INITIAL_LINES) {
 }
 
 function createWindow() {
+  const { workAreaSize } = screen.getPrimaryDisplay();
+  const initialHeight = Math.max(820, Math.floor(workAreaSize.height * 0.92));
+
   mainWindow = new BrowserWindow({
     width: 1200,
-    height: 820,
+    height: initialHeight,
     minWidth: 980,
     minHeight: 700,
+    autoHideMenuBar: true,
     backgroundColor: '#0f172a',
     webPreferences: {
       contextIsolation: true,
@@ -65,6 +69,8 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   });
+
+  Menu.setApplicationMenu(null);
 
   mainWindow.loadFile(path.join(__dirname, 'renderer/index.html'));
 }

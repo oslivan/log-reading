@@ -30,8 +30,10 @@ body {
   margin: 0 auto;
   padding: 16px;
   display: grid;
+  grid-template-rows: auto 1fr auto;
   gap: 14px;
   height: 100vh;
+  min-height: 0;
 }
 
 .card {
@@ -118,14 +120,16 @@ body {
 }
 
 .layout {
+  display: flex;
   min-height: 0;
 }
 
 .panel {
-  height: calc(100vh - 140px);
+  height: 100%;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  width: 100%;
 }
 
 .view-mode {
@@ -233,10 +237,4 @@ body {
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
-}
-
-@media (max-width: 1150px) {
-  .panel {
-    height: calc(100vh - 190px);
-  }
 }

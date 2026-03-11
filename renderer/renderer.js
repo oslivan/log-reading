@@ -148,8 +148,12 @@ function clearList(node, emptyText) {
   node.innerHTML = '';
   const p = document.createElement('div');
   p.className = 'log-item';
-  p.textContent = emptyText;
+  p.textContent = normalizeLogText(emptyText);
   node.appendChild(p);
+}
+
+function normalizeLogText(text) {
+  return String(text ?? '').replace(/<br\s*\/?>/gi, '\n');
 }
 
 function renderPageLines(lines) {
@@ -164,14 +168,9 @@ function renderPageLines(lines) {
     const row = document.createElement('div');
     row.className = 'log-item';
 
-    const lineNo = document.createElement('span');
-    lineNo.className = 'line-no';
-    lineNo.textContent = `#${line.no}`;
-
     const text = document.createElement('span');
-    text.textContent = line.text || ' ';
+    text.textContent = normalizeLogText(line.text || ' ');
 
-    row.appendChild(lineNo);
     row.appendChild(text);
     el.pageList.appendChild(row);
   }
@@ -189,7 +188,7 @@ function appendTailLines(lines) {
   for (const textLine of lines) {
     const row = document.createElement('div');
     row.className = 'log-item';
-    row.textContent = textLine || ' ';
+    row.textContent = normalizeLogText(textLine || ' ');
     fragment.appendChild(row);
   }
 
